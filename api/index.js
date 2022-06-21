@@ -17,15 +17,15 @@
 //     =====`-.____`.___ \_____/___.-`___.-'=====
 //                       `=---='
 //     ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-const { company, user, project, userHistory, ticket } = require ("./data/capdMock.js");
+const { user, ticket } = require ("./data/capdMock.js");
 const server = require('./src/app.js');
 const { conn } = require('./src/db.js');
-const { Company, User, UserHistory, Ticket } = require("./src/db");
-const {createProject, createUserHistory, createTicket} = require("./data/mockFunctions.js")
+const { User, Ticket } = require("./src/db");
+const {createProject, createUserHistory, createTicket, createUser} = require("./data/mockFunctions.js")
 
 // Syncing all the models at once.
 conn.sync({ force: false }).then(async () => {
-  try {
+  /* try {
     const companies = await company.forEach(async (e) => {
       await Company.findOrCreate({
         where: {
@@ -40,16 +40,15 @@ conn.sync({ force: false }).then(async () => {
     }); 
   } catch (error) {
     console.log(error)
-  }
+  } */
   try{
     const users = await user.forEach(async (e) => {
       await User.findOrCreate({
         where: {
           name: e.name,
-          last_name: e.last_name,
+          lastName: e.lastName,
           email: e.email,
           password: e.password,
-          assigned_company: e.assigned_company
         }
       })
     })
@@ -57,17 +56,17 @@ conn.sync({ force: false }).then(async () => {
     console.log(error)
   }
 
-  try{
+  /* try{
     const projects = await project.map((e) => createProject(e));
   }catch (error) {
     console.log(error)
-  }
+  } */
 
-  try{
+  /* try{
     const userHistories = await userHistory.map((e) => createUserHistory(e));
   }catch (error) {
     console.log(error)
-  }
+  } */
 
   try{
     const tickets = await ticket.map((e) => createTicket(e));

@@ -14,7 +14,7 @@ export default function LandingPage() {
         //console.log(data)
     } */
 
-    let loadCompanies = async () => {
+    /* let loadCompanies = async () => {
         const response = await fetch("http://localhost:3001/companies")
         const data = await response.json()
         //console.log(data, "companies")
@@ -23,23 +23,23 @@ export default function LandingPage() {
 
     useEffect(() => {
         loadCompanies()
-    }, [])
+    }, []) */
 
 
     return (
         <div>
             <br></br>
             <div>
-                <img src="https://media-exp1.licdn.com/dms/image/C4E0BAQGavY9B-2kWfw/company-logo_200_200/0/1634149307723?e=2147483647&v=beta&t=IuwN7uZjEUkMZfmrcfoDCAZbtIU-u9sPn3IVkJAbS9w" alt="fusepong_image"></img>
+                <img src="https://media-exp1.licdn.com/dms/image/C4E0BAQEWo1j-T3mZpg/company-logo_200_200/0/1605844114513?e=2147483647&v=beta&t=SqBXM0LEK1qdZ054lvxBc1ChSf8gKNQpQ3NfQV8yn7c" alt="pi-interactiva-logo" />
             </div>
-            <h1>Fusepong-CAPD</h1>
+            <h1>PI INTERACTIVA-LIST</h1>
             <Link to="/login">
                 <button>Login</button>
             </Link>
             <Link to="/signup">
                 <button>SignUp</button>
             </Link>
-            <h2>Companies</h2><hr/>
+           {/*  <h2>Companies</h2><hr/>
             {
                 companies.length === 0 ? <h3>Companies not found</h3>:companies.map((company) => {
                     return (
@@ -54,7 +54,7 @@ export default function LandingPage() {
                         </div>
                     )
                 })
-            }
+            } */}
         </div>
     )
 }

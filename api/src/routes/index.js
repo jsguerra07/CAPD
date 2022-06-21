@@ -1,37 +1,74 @@
 const { Router } = require('express');
-// Importar todos los routers;
-// Ejemplo: const authRouter = require('./auth.js');
 
-const { Company, Project, Ticket, UserHistory } = require("../db");
+const jwt = require("jsonwebtoken");
+const bcrytp = require("bcrypt")
+require("dotenv").config();
 
+const auth = require("../middlewares/auth")
+
+const { Ticket, User } = require("../db");
 
 const router = Router();
 
-// Configurar los routers
-// Ejemplo: router.use('/auth', authRouter);
+//+++++++++++++++++++AUTH++++++++++++++++++++
 
-//+++++++++++++++++COMPANIES++++++++++++++++++
-const getCompaniesInfo = async () => {
-    return await Company.findAll(
-        {
-            include: {
-                model: Project,
-                as: "projects",
-                attributes: ["name"],
+//+++++++++++++++++++USERS++++++++++++++++++++
 
+router.post("/signup", async (req, res) => {
+    try {
+        const { name, lastName, email } = req.body
+
+        let password = await bcrytp.hashSync(req.body.password, 10)
+
+        const newUser = await User.findOrCreate({
+            where: {
+                name,
+                lastName,
+                email,
+                password
+            },
+        })
+        
+        const token = jwt.sign({ id: newUser[0].id }, process.env.SECRET, { expiresIn: "20m" })
+        res.json({ userAuth: true, token })
+    } catch (error) {
+        console.error(error)
+    }
+})
+
+router.post("/login", async (req, res) => {
+    const { email, password } = req.body
+    try {
+        const user = await User.findOne({
+            where: {
+                email: email
+            }
+        })
+
+        if (user.length === 0) {
+            res.json("invalid email")
+        } else {
+            if (bcrypt.compareSync(password, user.password)) {
+                const token = jwt.sign({ id: user.id }, process.env.SECRET, { expiresIn: "20m" })
+                res.json({ userAuth: true, token })
+            } else {
+                res.status(4001).json({ msg: "invalid password" })
             }
         }
-    )
-}
-
-router.get("/companies", async (req, res) => {
-    let allCompanies = await getCompaniesInfo();
-    res.status(200).send(allCompanies)
+    } catch (error) {
+        res.json(error)
+    }
 })
+
+router.get("/user", (req, res) => {
+
+    res.json("user")
+})
+
 
 //+++++++++++++++++++TICKETS++++++++++++++++++++
 
-router.get("/tickets", async (req, res) => {
+router.get("/tickets", auth ,async (req, res) => {
     try {
         const allTicketsDb = await Ticket.findAll()
         /* const allTickets = allTicketsDb.data */
@@ -44,26 +81,20 @@ router.get("/tickets", async (req, res) => {
     }
 })
 
-router.post("/tickets/new/:id", async (req, res) => {
+router.post("/tickets/new", async (req, res) => {
     const { id } = req.params
     const { name, comments, status } = req.body
 
     try {
-        const userHistoryDb = await UserHistory.findOne({
-            where: {
-                id: id,
-            }
-        })
 
         const result = await Ticket.findOrCreate({
             where: {
                 name: name,
                 comments: comments,
                 status: status,
-                userHistory_id: userHistoryDb.id
             }
         })
-        console.log(req.body)
+        //console.log(req.body)
         res.send(result);
 
     } catch (error) {
@@ -71,43 +102,17 @@ router.post("/tickets/new/:id", async (req, res) => {
     }
 })
 
-/* router.post("/tickets", async (req, res) => {
-    const { name, comments, status, userHistory } = req.body
-
-    try {
-        const userHistoryDb = await UserHistory.findOne({
-            where: {
-                name: userHistory,
-            }
-        })
-
-        const result = await Ticket.findOrCreate({
-            where: {
-                name: name,
-                comments: comments,
-                status: status,
-                userHistory_id: userHistoryDb.id
-            }
-        })
-        console.log(req.body)
-        res.send(result);
-
-    } catch (error) {
-        res.send(error)
-    }
-}) */
 
 router.put("/tickets/:id", async (req, res) => {
     const { id } = req.params
-    const { name, comments, status, userHistory_id } = req.body
-    console.log(id, name, comments, status, userHistory_id)
+    const { name, comments, status } = req.body
+    console.log(id, name, comments, status)
 
     const updatedTicket = await Ticket.update(
         {
             name: name,
             comments: comments,
             status: status,
-            userHistory_id: userHistory_id
         },
         {
             where: {
@@ -118,7 +123,7 @@ router.put("/tickets/:id", async (req, res) => {
 
     console.log(updatedTicket)
 
-    res.send("updating of tickets");
+    res.json("updating of tickets");
 })
 
 router.delete("/tickets/:id", async (req, res) => {
@@ -131,8 +136,8 @@ router.delete("/tickets/:id", async (req, res) => {
                 id: id,
             }
         })
-        //console.log(deletedTask)
-        deletedTicket === 1 ? res.sendSatus(204) : res.send("Task not found")
+
+        deletedTicket === 1 ? res.sendStatus(204) : res.send("Ticket not found")
 
     } catch (error) {
         res.send(error)
@@ -140,7 +145,7 @@ router.delete("/tickets/:id", async (req, res) => {
 
 })
 
-/* router.get("/tickets/:id", async (req, res) => {
+router.get("/tickets/:id", async (req, res) => {
 
     const { id } = req.params
 
@@ -154,57 +159,10 @@ router.delete("/tickets/:id", async (req, res) => {
 
         ticketDb !== null ? res.send(ticketDb) : res.status(404).send("Ticket not found");
 
-        //res.send(ticketDb)
-
-    } catch (error) {
-        res.send(error)
-    }
-}) */
-
-//+++++++++++++++++++PROJECTS++++++++++++++++++++
-
-router.get("/projects", async (req, res) => {
-    try {
-        const allProjectsDb = await Project.findAll({
-            include: {
-                model: UserHistory,
-                as: "userHistories",
-                include: {
-                    model: Ticket,
-                    as: "tickets"
-                }
-            }
-        })
-        console.log(allProjectsDb, "projects")
-        res.send(allProjectsDb)
     } catch (error) {
         res.send(error)
     }
 })
-
-//+++++++++++++++++++USERHISTORIES++++++++++++++++++++
-
-router.get("/userHistories/:id", async (req, res) => {
-
-    const { id } = req.params
-
-    try {
-        const ticketsDb = await Ticket.findAll({
-            where: {
-                userHistory_id: id,
-            }
-        })
-        //console.log(req.params)
-
-        ticketsDb !== null ? res.send(ticketsDb) : res.status(404).send("Ticket not found");
-
-        //res.send(ticketDb)
-
-    } catch (error) {
-        res.send(error)
-    }
-})
-
 
 
 module.exports = router;

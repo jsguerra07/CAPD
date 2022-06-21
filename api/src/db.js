@@ -6,7 +6,7 @@ const {
   DB_USER, DB_PASSWORD, DB_HOST,
 } = process.env;
 
-const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/capd`, {
+const sequelize = new Sequelize(`postgres://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/ptpiinteractiva`, {
   logging: false, // set to console.log to see the raw SQL queries
   native: false, // lets Sequelize know we can use pg-native for ~30% more speed
 });
@@ -30,12 +30,12 @@ sequelize.models = Object.fromEntries(capsEntries);
 
 // En sequelize.models están todos los modelos importados como propiedades
 // Para relacionarlos hacemos un destructuring
-const { Company, Project, Ticket, User, UserHistory } = sequelize.models;
+const { Ticket, User } = sequelize.models;
 
 // Aca vendrian las relaciones
 // Product.hasMany(Reviews);
 
-Company.hasMany(Project, {
+/* Company.hasMany(Project, {
   as: "projects", 
   foreignKey: {name: "company_id", allowNull: false},
 });
@@ -60,7 +60,7 @@ UserHistory.hasMany(Ticket, {
 Ticket.belongsTo(UserHistory, {
   as: "UserHistory_tickets", 
   foreignKey: {name: "userHistory_id", allowNull: false},
-}); 
+});  */
 
 
 

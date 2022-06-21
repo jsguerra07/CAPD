@@ -3,8 +3,6 @@ import { useState, useEffect } from "react"
 import { useHistory, useParams } from "react-router-dom"
 import Ticket from "./Ticket"
 
-//import {Grid} from "@mui/material"
-
 export default function TicketForm() {
 
     const history = useHistory()
@@ -14,11 +12,10 @@ export default function TicketForm() {
         name: "",
         comments: "",
         status: "activo",
-        userHistory: "Porsche dataBase"
     })
 
     const [loading, setLoading] = useState(false)
-    const [editing, setEditing] = useState(true)
+    const [editing, setEditing] = useState(false)
 
     function handleInputChange(e) {
         e.preventDefault()
@@ -50,7 +47,7 @@ export default function TicketForm() {
             //const data= await response.json()
             console.log("update")
         } else {
-            const res = await fetch(`http://localhost:3001/tickets/new/${params.id}`, {
+            const res = await fetch(`http://localhost:3001/tickets/new`, {
                 method: "POST",
                 body: JSON.stringify(ticket),
                 headers: { "content-type": "application/json" },
@@ -58,31 +55,38 @@ export default function TicketForm() {
             const data = await res.json()
         }
 
+        /* const res = await fetch(`http://localhost:3001/tickets/new`, {
+                method: "POST",
+                body: JSON.stringify(ticket),
+                headers: { "content-type": "application/json" },
+         });
+        const data = await res.json() */
+
         setLoading(false)
         console.log(ticket)
         alert("Ticket was created successfully")
         history.push("/home")
     }
 
-    /* const loadTicket = async (id) => {
+    const loadTicket = async (id) => {
         const response = await fetch(`http://localhost:3001/tickets/${id}`)
         const data = await response.json()
         console.log(data)
         setTicket({ name: data.name, comments: data.comments, status: data.status })
-
+        setEditing(true)
     }
 
     useEffect(() => {
         if (params.id) {
             loadTicket(params.id)
-            //console.log(params)
+
         }
 
-    }, [params.id]) */
+    }, [params.id])
 
     return (
         <div>
-            <h3>Hola soy componente TicketForm</h3>
+
             <h3>Nuevo ticket</h3>
             <form onSubmit={(e) => handleSubmit(e)}>
                 <label>Name:</label>
@@ -99,7 +103,6 @@ export default function TicketForm() {
 
                 <button type="submit" disabled={!ticket.name}>{loading === true ? "loading" : "Save"}</button>
             </form>
-
         </div>
     )
 }

@@ -2,12 +2,11 @@ import React from "react"
 import {Link} from "react-router-dom"
 
 
-export default function UserHistory(userHistoryId) {
-    console.log(userHistoryId, "hello")
+export default function UserHistory() {
+    
     return (
         <div>
-            <h2>Hola soy componente User History</h2>
-            <Link to={"/ticket/new/" + userHistoryId.userHistoryId}>
+            <Link to={"/tickets/new" }>
                 <button>New Ticket</button>  
             </Link>
         </div>

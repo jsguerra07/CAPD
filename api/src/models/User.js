@@ -11,23 +11,19 @@ module.exports = (sequelize) => {
     },
     name: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
-    last_name: {
+    lastName: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false,
+      allowNull: true,
     },
     password: {
       type: DataTypes.STRING,
-      allowNull: false,
-      },
-    assigned_company: {
-      type: DataTypes.STRING,
-      allowNull: false,
-    },  
+      allowNull: true,
+      } 
   });
 };

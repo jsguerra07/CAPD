@@ -6,12 +6,9 @@ import UserHistory from "./UserHistory"
 export default function Ticket(props) {
     const history = useHistory()
     const [tickets, setTickets] = useState([])
-    console.log(props)
-    console.log(props.match.params.id)
 
-
-    const loadTickets = async (id) => {
-        const response = await fetch(`http://localhost:3001/userHistories/${id}`)
+    const loadTickets = async () => {
+        const response = await fetch(`http://localhost:3001/tickets`)
         const data = await response.json()
         setTickets(data)
         console.log(data)
@@ -36,7 +33,7 @@ export default function Ticket(props) {
     return (
         <>
             <h2>Lista de tickets</h2>
-            <UserHistory userHistoryId={props.match.params.id}></UserHistory>
+            <UserHistory ></UserHistory>
             {tickets.map((t) => {
                 return (
                     <div key={t.id}>
